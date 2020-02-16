@@ -189,21 +189,16 @@ def main():
     cheese_quantities = []
 
     for i in range(0, args.num_cheeses):
+        rand_num = random.random()
+        if rand_num < 0.5:
+            cheese_quantities = buy_some_cheese()
 
-    simulated_temp = 10 + random.random() * 20
-
-    if random.random() > 0.5:
-        temperature_trend = +1     # temps will slowly rise
-    else:
-        temperature_trend = -1     # temps will slowly fall
-
-
+    
     # Publish num_messages mesages to the MQTT bridge once per second.
     for i in range(1, args.num_messages + 1):
         for j in range (1, args.num_cheeses + 1):
-            cheese 
-            simulated_temp = simulated_temp + temperature_trend * random.normalvariate(0.01,0.005)
-            payload = {"timestamp": int(time.time()), "device": args.device_id, "cheese_id": 4, "cheese_amount" :50}
+            
+            payload = {"timestamp": int(time.time()), "cheese_id": j, "cheese_amount": cheese_quantities[j-1]}
             print('Publishing message {} of {}: \'{}\''.format(
                     i, args.num_messages, payload))
             jsonpayload =  json.dumps(payload,indent=4)
@@ -211,6 +206,7 @@ def main():
             # delivery. Cloud IoT Core also supports qos=0 for at most once
             # delivery.
             client.publish(mqtt_topic, jsonpayload, qos=1)
+            cheese_quantities[j-1] = new_cheese_value(cheese_quantities[j-1])
 
             # Send events every second. State should not be updated as often
             time.sleep(1 if args.message_type == 'event' else 5)
@@ -223,10 +219,11 @@ def main():
 def new_cheese_value(current_cheese):
     rand_num = random.random()
     #If we haven't got any cheese, 70% chance we don't buy any more cheese
-    if current_cheese = 0:
+    if current_cheese == 0:
       if rand_num < 0.7:
         return 0
-      else return buy_more_cheese()
+      else:
+        return buy_more_cheese()
     #If we've got cheese, 50% chance we don't eat any
     if rand_num > 0.5:
         current_cheese = current_cheese - eat_some_cheese()
@@ -240,10 +237,10 @@ def new_cheese_value(current_cheese):
         return current_cheese + buy_more_cheese()
     return current_cheese
 
-def buy_more_cheese()
+def buy_more_cheese():
     return random.choice([100, 150, 200, 200, 250, 250, 250, 300, 500, 700])
 
-def eat_some_cheese()
+def eat_some_cheese():
     return random.choice([25, 25, 50, 50,50, 75, 100, 100, 100, 200])
 
 if __name__ == '__main__':
